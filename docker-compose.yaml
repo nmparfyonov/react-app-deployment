@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  react-app:
+    image: nmparfyonov-react-app:latest
+    ports:
+      - "80:80"
+    restart: always
