@@ -32,7 +32,7 @@ pipeline {
         }
     }
     environment {
-        CHAT_ID = -4512275255
+        CHAT_ID = credentials('telegram-chat-id')
     }
     stages {
         stage('Notify start') {
