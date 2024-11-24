@@ -36,17 +36,20 @@ pipeline {
         TG_CHAT_ID = credentials('telegram-chat-id')
     }
     stages {
-        stage('Notify start') {
+        stage('Notify build start') {
             steps {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"ℹ️ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* started ℹ️\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"ℹ️ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* build started ℹ️\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
                 }
             }
         }
-        stage('Test') {
+        stage('Build') {
             steps {
                 container('docker') {
-                    sh "npm -v"
+                    sh "docker build -t rs-react:latest ."
+                }
+                script {
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"✅ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* build success ✅\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
                 }
             }
         }
