@@ -32,8 +32,7 @@ pipeline {
         }
     }
     environment {
-        BOT_TOKEN = credentials('telegram-bot-token')
-        CHAT_ID = credentials('telegram-chat-id')
+        CHAT_ID = -4512275255
     }
     stages {
         stage('Notify start') {
@@ -52,7 +51,6 @@ pipeline {
             steps {
                 script {
                         telegramSend(
-                        botToken: env.BOT_TOKEN,
                         chatId: env.CHAT_ID,
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
@@ -66,7 +64,6 @@ pipeline {
     post {
         failure {
                 telegramSend(                
-                botToken: env.BOT_TOKEN,
                 chatId: env.CHAT_ID,
                 message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed!"
                 )
