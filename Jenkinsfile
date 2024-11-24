@@ -61,13 +61,6 @@ pipeline {
                   volumeMounts:
                     - name: kubeconfig
                       mountPath: /root/.kube
-                - name: kubectl
-                  image: bitnami/kubectl:1.28
-                  command: ['sleep']
-                  args: ['99d']
-                  volumeMounts:
-                    - name: kubeconfig
-                      mountPath: /root/.kube
             """
         }
     }
@@ -78,6 +71,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         AWS_REGION = 'eu-central-1'
         ECR_REGISTRY = credentials('ecr-registry')
+        WORKER_IP=192.168.3.166:30088
     }
     stages {
         stage('Build') {
@@ -141,13 +135,9 @@ pipeline {
         }
         stage('Verify') {
             steps {
-                container('kubectl') {
-                    sh "export NODE_PORT=\$(kubectl get --namespace default -o jsonpath=\"{.spec.ports[0].nodePort}\" services rs-react)"
-                    sh "export NODE_IP=\$(kubectl get nodes --namespace default -o jsonpath=\"{.items[0].status.addresses[0].address}\")"
-                    sh "echo http://\$NODE_IP:\$NODE_PORT > service_access"
-                }
                 script {
-                    sh "curl \$(cat service_access)"
+                    sh "sleep 30"
+                    sh "curl http://${env.SERVICE_ADDRESS}:"
                 }
                 script {
                     sendNotification("success", "VERIFIED")
