@@ -32,14 +32,14 @@ pipeline {
         }
     }
     environment {
-        TG_CHAT_ID = credentials('telegram-chat-id')
         TG_TOKEN = credentials('telegram-bot-token')
+        TG_CHAT_ID = credentials('telegram-chat-id')
     }
     stages {
         stage('Notify start') {
             steps {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started\" --form chat_id=\"$CHAT_ID\""
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started\" --form chat_id=\"${TG_CHAT_ID}\""
                 }
             }
         }
