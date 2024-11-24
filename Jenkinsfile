@@ -31,28 +31,27 @@ pipeline {
             """
         }
     }
+    environment {
+        CHAT_ID = credentials('telegram-chat-id')
+    }
     stages {
         stage('Notify start') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
-                        telegramSend(
-                        chatId: ${CHAT_ID},
-                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
-                        )
-                    }
+                    telegramSend(
+                    chatId: env.CHAT_ID,
+                    message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
+                    )
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
                         telegramSend(
                         chatId: $CHAT_ID,
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
-                    }
                 }
                 // container('docker') {
                 //     sh "docker build ."
@@ -62,7 +61,6 @@ pipeline {
     }
     post {
         failure {
-            withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
                 telegramSend(
                 chatId: CHAT_ID,
                 message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed!"
