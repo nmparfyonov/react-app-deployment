@@ -53,7 +53,7 @@ pipeline {
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
                     }
-                },
+                }
                 container('docker') {
                     sh "docker build ."
                 }
