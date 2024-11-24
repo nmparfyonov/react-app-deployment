@@ -142,7 +142,6 @@ pipeline {
         stage('Verify') {
             steps {
                 container('kubectl') {
-                    sh "sleep 30"
                     sh "export NODE_PORT=\$(kubectl get --namespace default -o jsonpath=\"{.spec.ports[0].nodePort}\" services rs-react)"
                     sh "export NODE_IP=\$(kubectl get nodes --namespace default -o jsonpath=\"{.items[0].status.addresses[0].address}\")"
                     sh "echo http://\$NODE_IP:\$NODE_PORT > service_access"
