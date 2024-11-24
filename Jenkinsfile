@@ -1,3 +1,20 @@
+def sendNotification(status, step) {
+    def emoji
+    if (status == "start") {
+        emoji = "ℹ️"
+    } else if (status == "success") {
+        emoji = "✅"
+    } else if (status == "failure") {
+        emoji = "❌"
+    }
+    def message = "${emoji} *${step}* ${status} ${emoji}"
+    sh """
+    curl --location --request POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+         --form text="${message}" \
+         --form parse_mode=markdown \
+         --form chat_id="${TG_CHAT_ID}"
+    """
+}
 pipeline {
     agent {
         kubernetes {
@@ -42,38 +59,30 @@ pipeline {
         TG_CHAT_ID = credentials('telegram-chat-id')
     }
     stages {
-        stage('Notify build start') {
-            steps {
-                script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"ℹ️ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* started ℹ️\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
-                }
-            }
-        }
         stage('Build') {
             steps {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"ℹ️ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* BUILD started ℹ️\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sendNotification("start", "BUILD")
                 }
                 container('node') {
                     sh "yarn install"
                     sh "yarn run build"
                 }
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"✅ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* BUILD success ✅\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sendNotification("success", "BUILD")
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"ℹ️ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* TEST started ℹ️\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sendNotification("start", "TEST")
                 }
                 container('node') {
-                    sh "yarn install"
                     sh "yarn run test"
                 }
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"✅ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* TEST success ✅\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sendNotification("success", "TEST")
                 }
             }
         }
@@ -81,7 +90,7 @@ pipeline {
     post {
         failure {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"❌ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* failed ❌\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                    sendNotification("failure", "pipeline")
                 }
             }
         }    
