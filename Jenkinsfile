@@ -86,6 +86,19 @@ pipeline {
                 }
             }
         }
+        stage('Docker') {
+            steps {
+                script {
+                    sendNotification("start", "TEST")
+                }
+                container('docker') {
+                    sh "docker build -t react-app-deployment:latest -t react-app-deployment:${env.BUILD_NUMBER} ."
+                }
+                script {
+                    sendNotification("success", "TEST")
+                }
+            }
+        }
     }
     post {
         failure {
