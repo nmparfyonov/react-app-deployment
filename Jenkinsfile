@@ -40,7 +40,6 @@ pipeline {
                 script {
                     sh "echo $CHAT_ID"
                     telegramSend(
-                    botToken: env.BOT_TOKEN,
                     chatId: env.CHAT_ID,
                     message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                     )
