@@ -39,7 +39,7 @@ pipeline {
         stage('Notify start') {
             steps {
                 script {
-                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\" Pipeline <b>${env.JOB_NAME}<\b> #${env.BUILD_NUMBER} started\ " --form chat_id=\"${TG_CHAT_ID}\""
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\" Pipeline <b>${env.JOB_NAME}<\b> #${env.BUILD_NUMBER} started\" --form chat_id=\"${TG_CHAT_ID}\""
                 }
             }
         }
