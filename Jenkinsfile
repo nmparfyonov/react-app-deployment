@@ -62,43 +62,43 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sendNotification("start", "BUILD")
+                    sh "env"
                 }
-                container('node') {
-                    sh "yarn install"
-                    sh "yarn run build"
-                }
-                script {
-                    sendNotification("success", "BUILD")
-                }
+                // container('node') {
+                //     sh "yarn install"
+                //     sh "yarn run build"
+                // }
+                // script {
+                //     sendNotification("success", "BUILD")
+                // }
             }
         }
-        stage('Test') {
-            steps {
-                script {
-                    sendNotification("start", "TEST")
-                }
-                container('node') {
-                    sh "yarn run test"
-                }
-                script {
-                    sendNotification("success", "TEST")
-                }
-            }
-        }
-        stage('Docker') {
-            steps {
-                script {
-                    sendNotification("start", "TEST")
-                }
-                container('docker') {
-                    sh "docker build -t react-app-deployment:latest -t react-app-deployment:${env.BUILD_NUMBER} ."
-                }
-                script {
-                    sendNotification("success", "TEST")
-                }
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             sendNotification("start", "TEST")
+        //         }
+        //         container('node') {
+        //             sh "yarn run test"
+        //         }
+        //         script {
+        //             sendNotification("success", "TEST")
+        //         }
+        //     }
+        // }
+        // stage('Docker') {
+        //     steps {
+        //         script {
+        //             sendNotification("start", "TEST")
+        //         }
+        //         container('docker') {
+        //             sh "docker build -t react-app-deployment:latest -t react-app-deployment:${env.BUILD_NUMBER} ."
+        //         }
+        //         script {
+        //             sendNotification("success", "TEST")
+        //         }
+        //     }
+        // }
     }
     post {
         failure {
