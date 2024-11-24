@@ -104,12 +104,12 @@ pipeline {
                 }
                 container('docker') {
                     sh "docker build -t ${env.ECR_REGISTRY}/rs-react:latest -t ${env.ECR_REGISTRY}/rs-react:1.0.${env.BUILD_NUMBER} ."
-                    sh "cat .dockercreds | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
+                    sh "cat .dockercredentials | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
                     sh "docker push ${env.ECR_REGISTRY}/rs-react:latest"
                     sh "docker push ${env.ECR_REGISTRY}/rs-react:1.0.${env.BUILD_NUMBER}"
                 }
                 script {
-                    sendNotification("success", "DOCKER build")
+                    sendNotification("success", "DOCKER build and push")
                 }
             }
         }
