@@ -137,7 +137,7 @@ pipeline {
             steps {
                 script {
                     sh "sleep 30"
-                    sh "curl http://${env.SERVICE_ADDRESS}:"
+                    sh "curl http://${env.SERVICE_ADDRESS}"
                 }
                 script {
                     sendNotification("success", "VERIFIED")
