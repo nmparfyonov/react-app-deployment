@@ -1,70 +1,48 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `yarn start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Application Deployment
+## Prerequsites
+* `Kubernetes` cluster
+* `Jenkins` deployed in this cluster with following plugins:
+    * kubernetes
+    * workflow-aggregator
+    * git
+    * github
+* `Telegram` bot
+* `ECR` registry and AWS account with access to it
+## Setup and usage
+1. Create jenkins pipeline with `git source` and select `GitHub hook trigger for GITScm polling`
+1. _OPTIONAL_ Add webhook trigger to github repo in repo settings
+1. Add following credentials secrets to jenkins:
+    * `telegram-bot-token` - Telegram bot token for notifications
+    * `telegram-chat-id` - Telegram chat id for notifications
+    * `aws-access-key-id` - AWS access key for user with read/write access to ECR 
+    * `aws-secret-access-key` - AWS secret access key for user with read/write access to ECR 
+    * `ecr-registry` - Link to ECR registry (e.g. 123456789123.dkr.ecr.us-east-1.amazonaws.com)
+1. Create configmaps in your kubernetes cluster for helm deployment and ECR access:
+    * `ECR` is used to pull image from registry when helm chart deploys:
+        ```bash
+        kubectl create secret docker-registry rs-react \
+         --docker-server=123456789123.dkr.ecr.us-east-1.amazonaws.com \
+         --docker-username=AWS \
+         --docker-password=$(aws ecr get-login-password)
+        ```
+    * `HELM` - access to kubernetes master to deploy helm chart:
+        ```bash
+        kubectl create configmap kubeconfig-configmap --from-file=.kube/config
+        ```
+1. Trigger build manually or by pushing to repository if webhook is set
+## Deployment process
+Pipeline has following steps:
+1. Application build
+    ```bash
+    yarn install
+    yarn run build
+    ```
+1. Sample Unit test execution
+    ```bash
+    yarn run test
+    ```
+1. Docker image build and push to ECR
+    1. Authorize ECR using `aws-cli` container
+    1. Build and Push image using `docker` container
+1. Deploy helm chart to kubernetes cluster using `helm` container with configmap `kubeconfig-configmap` mounted
+1. Verify application deployment with `curl` main page
