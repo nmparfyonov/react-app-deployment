@@ -43,20 +43,19 @@ pipeline {
                 }
             }
         }
-        // stage('Test') {
-        //     steps {
-        //         container('docker') {
-        //             sh "docker build ."
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                container('docker') {
+                    sh "npm -v"
+                }
+            }
+        }
     }
     post {
         failure {
-                telegramSend(                
-                chatId: env.CHAT_ID,
-                message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed!"
-                )
+                script {
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"❌ Pipeline *${env.JOB_NAME} #${env.BUILD_NUMBER}* failed ❌\" --form parse_mode=markdown --form chat_id=\"${TG_CHAT_ID}\""
+                }
             }
         }    
 }
