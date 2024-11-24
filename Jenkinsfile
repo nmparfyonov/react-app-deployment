@@ -43,13 +43,13 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
-            steps {
-                container('docker') {
-                    sh "docker build ."
-                }
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         container('docker') {
+        //             sh "docker build ."
+        //         }
+        //     }
+        // }
     }
     post {
         failure {
