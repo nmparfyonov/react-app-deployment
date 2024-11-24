@@ -103,9 +103,9 @@ pipeline {
                     sh "aws ecr get-login-password --region ${AWS_REGION} > .dockercreds"
                 }
                 container('docker') {
-                    sh "docker build -t ${env.ECR_REGISTRY}/react-app-deployment:latest -t ${env.ECR_REGISTRY}/react-app-deployment:1.0.${env.BUILD_NUMBER} ."
+                    sh "docker build -t ${env.ECR_REGISTRY}/rs-react:latest -t ${env.ECR_REGISTRY}/rs-react:1.0.${env.BUILD_NUMBER} ."
                     sh "cat .dockercreds | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
-                    sh "docker push ${env.ECR_REGISTRY}/react-app-deployment"
+                    sh "docker push ${env.ECR_REGISTRY}/rs-react"
                 }
                 script {
                     sendNotification("success", "DOCKER build")
