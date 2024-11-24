@@ -71,7 +71,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         AWS_REGION = 'eu-central-1'
         ECR_REGISTRY = credentials('ecr-registry')
-        WORKER_IP='192.168.3.166:30088'
+        SERVICE_ADDRESS='192.168.3.166:30088'
     }
     stages {
         stage('Build') {
