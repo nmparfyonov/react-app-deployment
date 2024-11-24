@@ -45,9 +45,9 @@ pipeline {
         }
         stage('Test') {
             steps {
-                // container('docker') {
-                //     sh "docker build ."
-                // }
+                container('docker') {
+                    sh "docker build ."
+                }
             }
         }
     }
