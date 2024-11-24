@@ -32,28 +32,19 @@ pipeline {
         }
     }
     environment {
-        CHAT_ID = credentials('telegram-chat-id')
+        TG_CHAT_ID = credentials('telegram-chat-id')
+        TG_TOKEN = credentials('telegram-bot-token')
     }
     stages {
         stage('Notify start') {
             steps {
                 script {
-                    sh "echo $CHAT_ID"
-                    telegramSend(
-                    chatId: env.CHAT_ID,
-                    message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
-                    )
+                    sh "curl --location --request POST \"https://api.telegram.org/bot${TG_TOKEN}/sendMessage\" --form text=\"Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started\" --form chat_id=\"$CHAT_ID\""
                 }
             }
         }
         stage('Test') {
             steps {
-                script {
-                        telegramSend(
-                        chatId: env.CHAT_ID,
-                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
-                        )
-                }
                 // container('docker') {
                 //     sh "docker build ."
                 // }
