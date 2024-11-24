@@ -25,6 +25,9 @@ pipeline {
                 volumes:
                 - name: docker-socket
                   emptyDir: {}
+                - name: kubeconfig
+                  configMap:
+                    name: kubeconfig-configmap
                 containers:
                 - name: docker
                   image: docker:27.3.1
@@ -55,6 +58,13 @@ pipeline {
                   image: amazon/aws-cli:2.13.7
                   command: ['sleep']
                   args: ['99d']
+                - name: helm
+                  image: alpine/helm:3.12.3
+                  command: ['sleep']
+                  args: ['99d']
+                  volumeMounts:
+                    - name: kubeconfig
+                      mountPath: /root/.kube
             """
         }
     }
@@ -110,6 +120,19 @@ pipeline {
                 }
                 script {
                     sendNotification("success", "DOCKER build and push")
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sendNotification("start", "DEPLOY")
+                }
+                container('helm') {
+                    sh "helm upgrade --install rs-react helm-chart/ --set image.registry=${env.ECR_REGISTRY} --set image.tag=1.0.${env.BUILD_NUMBER}"
+                }
+                script {
+                    sendNotification("success", "DEPLOY")
                 }
             }
         }
