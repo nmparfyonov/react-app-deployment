@@ -7,7 +7,7 @@ def sendNotification(status, step) {
     } else if (status == "failure") {
         emoji = "❌"
     }
-    def message = "${emoji} *${step}* ${status} ${emoji}"
+    def message = "${emoji} ${step} *${env.JOB_NAME} #${env.BUILD_NUMBER}* ${status} ${emoji}"
     sh """
     curl --location --request POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
          --form text="${message}" \
