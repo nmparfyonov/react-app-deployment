@@ -32,6 +32,18 @@ pipeline {
         }
     }
     stages {
+        stage('Notify') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
+                        telegramSend(
+                        chatId: CHAT_ID,
+                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
+                        )
+                    }
+                }
+            }
+        }
         stage('Test') {
             steps {
                 container('docker') {
@@ -39,5 +51,27 @@ pipeline {
                 }
             }
         }
+        stage('Notify') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
+                        telegramSend(
+                        chatId: CHAT_ID,
+                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully!"
+                        )
+                    }
+                }
+            }
+        }
+    }
+    post {
+        failure {
+            withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
+                telegramSend(
+                chatId: CHAT_ID,
+                message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed!"
+                )
+            }
+        }    
     }
 }
