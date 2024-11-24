@@ -34,10 +34,8 @@ pipeline {
                   readinessProbe:
                     exec:
                       command: [sh, -c, "ls -S /var/run/docker.sock"]
-                  command:
-                  - sleep
-                  args:
-                  - 99d
+                  command: ['sleep']
+                  args: ['99d']
                   volumeMounts:
                   - name: docker-socket
                     mountPath: /var/run
@@ -50,10 +48,8 @@ pipeline {
                     mountPath: /var/run
                 - name: node
                   image: node:18-alpine
-                  command:
-                  - sleep
-                  args:
-                  - 99d
+                  command: ['sleep']
+                  args: ['99d']
                 - name: aws-cli
                   image: amazon/aws-cli:2.13.7
                   command: ['sleep']
