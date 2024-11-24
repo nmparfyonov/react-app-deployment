@@ -37,7 +37,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
                         telegramSend(
-                        chatId: CHAT_ID,
+                        chatId: ${CHAT_ID},
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
                     }
@@ -49,14 +49,14 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
                         telegramSend(
-                        chatId: CHAT_ID,
+                        chatId: $CHAT_ID,
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
                     }
                 }
-                container('docker') {
-                    sh "docker build ."
-                }
+                // container('docker') {
+                //     sh "docker build ."
+                // }
             }
         }
     }
