@@ -38,6 +38,7 @@ pipeline {
         stage('Notify start') {
             steps {
                 script {
+                    sh "echo $CHAT_ID"
                     telegramSend(
                     chatId: env.CHAT_ID,
                     message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
@@ -49,7 +50,7 @@ pipeline {
             steps {
                 script {
                         telegramSend(
-                        chatId: $CHAT_ID,
+                        chatId: env.CHAT_ID,
                         message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
                 }
@@ -62,7 +63,7 @@ pipeline {
     post {
         failure {
                 telegramSend(
-                chatId: CHAT_ID,
+                chatId: env.CHAT_ID,
                 message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} failed!"
                 )
             }
