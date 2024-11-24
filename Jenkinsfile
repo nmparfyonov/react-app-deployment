@@ -125,7 +125,7 @@ pipeline {
                     sendNotification("start", "DEPLOY")
                 }
                 container('helm') {
-                    sh "helm upgrade --install rs-react helm-chart/ --set image.registry=${env.ECR_REGISTRY} --set image.tag=1.0.${env.BUILD_NUMBER}"
+                    sh "helm upgrade --install rs-react helm-chart/ --set image.registry=${env.ECR_REGISTRY} --set image.tag=1.0.${env.BUILD_NUMBER} -n default"
                 }
                 script {
                     sendNotification("success", "DEPLOY")
