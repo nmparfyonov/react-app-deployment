@@ -32,7 +32,7 @@ pipeline {
         }
     }
     stages {
-        stage('Notify') {
+        stage('Notify start') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
@@ -46,20 +46,16 @@ pipeline {
         }
         stage('Test') {
             steps {
-                container('docker') {
-                    sh "docker build ."
-                }
-            }
-        }
-        stage('Notify') {
-            steps {
                 script {
                     withCredentials([string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
                         telegramSend(
                         chatId: CHAT_ID,
-                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} completed successfully!"
+                        message: "Pipeline ${env.JOB_NAME} #${env.BUILD_NUMBER} started"
                         )
                     }
+                },
+                container('docker') {
+                    sh "docker build ."
                 }
             }
         }
