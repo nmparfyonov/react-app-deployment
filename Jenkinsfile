@@ -5,6 +5,9 @@ pipeline {
               apiVersion: v1
               kind: Pod
               spec:
+                volumes:
+                - name: docker-socket
+                  emptyDir: {}
                 containers:
                 - name: docker
                   image: docker:27.3.1
